@@ -25,10 +25,13 @@ class SelfIEGuardrail(BaseGuardrail):
 class KeywordFilterGuardrail(BaseGuardrail):
 
     def __init__(self):
-        pass
+        # Load harmful keyword set from a text file
+        with open("verified_harmful_keywords.txt", "r") as f:
+            self.harmful_keywords_llm = set(line.strip() for line in f)
 
     @overrides
-    def __call__(self, text: str) -> str:
-        pass    # TODO:
+    def __call__(self, text: str) -> bool:
+        # Return True if any harmful keyword is found in the input text
+        return any(phrase.lower() in text.lower() for phrase in self.harmful_keywords_llm)
 
 

@@ -93,5 +93,9 @@ class WikipediaQAAgent:
         return final_answer
 
     def _batch_qa_pipeline(self, questions: list[str]) -> list[str]:
-        # TODO: complete this
-        pass
+        answers = []
+        for question in questions:
+            ans = self._qa_pipeline(question)
+            answers.append(ans)
+            print(ans)
+        return answers

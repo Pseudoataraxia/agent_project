@@ -2,6 +2,7 @@ from selfie_src.selfie_for_transformers_4_46_3.generate_wrappers import model_fo
     my_generate_interpret
 from tqdm import tqdm
 import torch
+import re
 
 
 class InterpretationPrompt:
@@ -19,6 +20,41 @@ class InterpretationPrompt:
                 self.interpretation_prompt += "_ "
 
         self.tokenized_interpretation_prompt = self.tokenizer(self.interpretation_prompt, return_tensors="pt")
+
+    @staticmethod
+    def string_to_tuple(s: str, delimiters: list[str]) -> tuple[str | int]:
+        """
+        Converts a string into a tuple where substrings separated by delimiters
+        are kept as strings, and each delimiter is replaced by an integer zero.
+
+        Parameters:
+        - s (str): The input string to be converted.
+        - delimiters (List[str]): A list of delimiter substrings.
+
+        Returns:
+        - Tuple[Union[str, int], ...]: The resulting tuple with strings and zeros.
+        """
+        if not delimiters:
+            # If no delimiters are provided, return the entire string as a single-element tuple
+            return (s,)
+
+        # Escape delimiters to handle any special regex characters
+        escaped_delims = [re.escape(d) for d in delimiters]
+        # Create a regex pattern that matches any of the delimiters
+        pattern = '|'.join(escaped_delims)
+
+        # Use re.split with capturing parentheses to include the delimiters in the result
+        split_list = re.split(f'({pattern})', s)
+
+        # Process the split list: replace delimiters with 0, keep other substrings as strings
+        result = []
+        for item in split_list:
+            if item in delimiters:
+                result.append(0)
+            elif item:  # Exclude empty strings resulting from consecutive delimiters
+                result.append(item)
+
+        return tuple(result)
 
 
 def interpret(original_prompt=None,

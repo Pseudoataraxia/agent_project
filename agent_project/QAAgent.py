@@ -54,7 +54,7 @@ class WikipediaQAAgent:
     safety_alert_message = "Sorry, I can't help with that."
     # TODO: might change this message to a better one?
 
-    def __init__(self, device):
+    def __init__(self, guardrail, device):
         self.embedding_model = HuggingFaceEmbeddings("sentence-transformers/all-MiniLM-L6-v2", device=device)
         # TODO: make embeddings models loaded from locally saved weights
 
@@ -64,7 +64,7 @@ class WikipediaQAAgent:
         # I have already downloaded llama 3.1 7b-instruct on my google drive.
 
         self.wikipedia_tool = WikipediaAPIWrapper()
-        self.guardrail = None    # TODO: add guardrail
+        self.guardrail = guardrail
 
     def __call__(self, question: str) -> str:
         return self._qa_pipeline(question)

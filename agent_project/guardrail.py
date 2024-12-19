@@ -26,7 +26,7 @@ class KeywordFilterGuardrail(BaseGuardrail):
 
     def __init__(self):
         # Load harmful keyword set from a text file
-        with open("verified_harmful_keywords.txt", "r") as f:
+        with open("./verified_harmful_keywords.txt", "r") as f:
             self.harmful_keywords_llm = set(line.strip() for line in f)
 
     @overrides

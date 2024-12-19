@@ -1,12 +1,11 @@
-import torch
-from langchain.vectorstores import FAISS
-from langchain.docstore.document import Document
-from langchain.text_splitter import CharacterTextSplitter
+import numpy as np
+import transformers
 from langchain import WikipediaAPIWrapper
+from langchain.docstore.document import Document
 # from langchain.llms import HuggingFacePipeline
 from langchain.embeddings.base import Embeddings
-import transformers
-import numpy as np
+from langchain.text_splitter import CharacterTextSplitter
+from langchain.vectorstores import FAISS
 
 
 class HuggingFaceEmbeddings(Embeddings):

@@ -53,7 +53,7 @@ class HuggingFaceEmbeddings(Embeddings):
 
 
 class WikipediaQAAgent:
-    safety_alert_message = "Sorry, I can't help with that."
+    safety_alert_message = "Guardrail alerted. Sorry, I can't help with that."
     # TODO: might change this message to a better one?
 
     def __init__(self, embedding_model_name, answer_llm_name, guardrail, device=None):
@@ -61,13 +61,8 @@ class WikipediaQAAgent:
             device = 0 if torch.cuda.is_available() else -1
 
         self.embedding_model = HuggingFaceEmbeddings(embedding_model_name, device=device)
-        # TODO: make embeddings models loaded from locally saved weights
-
         self.answer_llm = transformers.pipeline("text-generation", model=answer_llm_name,
                                                 device=device, max_length=1000, truncation=True)
-        # TODO: change answer_model to a locally saved model; also change the model to llama 3.1 7b-instruct
-        # I have already downloaded llama 3.1 7b-instruct on my google drive.
-
         self.wikipedia_tool = WikipediaAPIWrapper()
         self.guardrail = guardrail if guardrail is not None else NoGuardrail()
 

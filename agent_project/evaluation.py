@@ -7,7 +7,7 @@ import os
 
 
 def main():
-    question_tuples = pd.read_csv(os.getcwd() + "/questions.csv")
+    question_tuples = pd.read_csv(os.getcwd() + "agent_project/questions.csv")
     questions = []
     if_nsfw = []
     for index, question in question_tuples.iterrows():

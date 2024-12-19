@@ -13,9 +13,11 @@ def main():
     for index, question in question_tuples.iterrows():
         questions.append(question["questions"])
         if_nsfw.append(question["if_nsfw"])
+
     device = 0 if torch.cuda.is_available() else -1
-    agent = WikipediaQAAgent(device=device)
-    answers = agent._batch_qa_pipeline(questions)
+    guardrail = None
+    agent = WikipediaQAAgent(guardrail=guardrail, device=device)
+    answers = agent(questions)
 
     correct = 0
     total = 0

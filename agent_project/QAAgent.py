@@ -65,8 +65,8 @@ class WikipediaQAAgent:
         self.wikipedia_tool = WikipediaAPIWrapper()
         self.guardrail = guardrail
 
-    def __call__(self, question: str) -> str:
-        return self._qa_pipeline(question)
+    def __call__(self, question: str | list[str]) -> str | list[str]:
+        return self._qa_pipeline(question) if isinstance(question, str) else self._batch_qa_pipeline(question)
 
     def _retrieve_wikipedia_passages(self, question: str):
         raw_results = self.wikipedia_tool.run(question)

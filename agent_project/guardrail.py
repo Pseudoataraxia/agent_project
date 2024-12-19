@@ -3,6 +3,7 @@ from overrides import overrides
 
 import os
 
+
 class BaseGuardrail(ABC):
     @abstractmethod
     def __call__(self, text: str) -> bool:
@@ -10,6 +11,13 @@ class BaseGuardrail(ABC):
         detects if input is harmful/inappropriate.
         """
         return False
+
+
+class NoGuardrail(BaseGuardrail):
+
+    @overrides
+    def __call__(self, text: str) -> bool:
+        return True
 
 
 class SelfIEGuardrail(BaseGuardrail):

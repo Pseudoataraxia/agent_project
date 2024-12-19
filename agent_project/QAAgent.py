@@ -1,5 +1,6 @@
 import numpy as np
 import transformers
+import torch
 from langchain import WikipediaAPIWrapper
 from langchain.docstore.document import Document
 # from langchain.llms import HuggingFacePipeline
@@ -53,7 +54,10 @@ class WikipediaQAAgent:
     safety_alert_message = "Sorry, I can't help with that."
     # TODO: might change this message to a better one?
 
-    def __init__(self, embedding_model_name, answer_llm_name, guardrail, device):
+    def __init__(self, embedding_model_name, answer_llm_name, guardrail, device=None):
+        if device is None:
+            device = 0 if torch.cuda.is_available() else -1
+
         self.embedding_model = HuggingFaceEmbeddings(embedding_model_name, device=device)
         # TODO: make embeddings models loaded from locally saved weights
 

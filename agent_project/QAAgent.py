@@ -57,7 +57,7 @@ class WikipediaQAAgent:
         self.embedding_model = HuggingFaceEmbeddings(embedding_model_name, device=device)
         # TODO: make embeddings models loaded from locally saved weights
 
-        self.answer_llm = transformers.pipeline("text-generation", model=answer_llm_name,
+        self.answer_llm = transformers.pipeline("text-generation", model=answer_llm_name, repo_type='local',
                                                 device=device, max_length=1000, truncation=True)
         # TODO: change answer_model to a locally saved model; also change the model to llama 3.1 7b-instruct
         # I have already downloaded llama 3.1 7b-instruct on my google drive.

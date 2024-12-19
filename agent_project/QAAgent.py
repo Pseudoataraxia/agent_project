@@ -8,6 +8,8 @@ from langchain.embeddings.base import Embeddings
 from langchain.text_splitter import CharacterTextSplitter
 from langchain.vectorstores import FAISS
 
+from .guardrail import NoGuardrail
+
 
 class HuggingFaceEmbeddings(Embeddings):
     def __init__(self, model_name: str, device: str | int):
@@ -67,7 +69,7 @@ class WikipediaQAAgent:
         # I have already downloaded llama 3.1 7b-instruct on my google drive.
 
         self.wikipedia_tool = WikipediaAPIWrapper()
-        self.guardrail = guardrail
+        self.guardrail = guardrail if guardrail is not None else NoGuardrail()
 
     def __call__(self, question: str | list[str]) -> str | list[str]:
         return self._qa_pipeline(question) if isinstance(question, str) else self._batch_qa_pipeline(question)

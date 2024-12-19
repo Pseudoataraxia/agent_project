@@ -53,11 +53,11 @@ class WikipediaQAAgent:
     safety_alert_message = "Sorry, I can't help with that."
     # TODO: might change this message to a better one?
 
-    def __init__(self, guardrail, device):
-        self.embedding_model = HuggingFaceEmbeddings("sentence-transformers/all-MiniLM-L6-v2", device=device)
+    def __init__(self, embedding_model_name, answer_llm_name, guardrail, device):
+        self.embedding_model = HuggingFaceEmbeddings(embedding_model_name, device=device)
         # TODO: make embeddings models loaded from locally saved weights
 
-        self.answer_llm = transformers.pipeline("text-generation", model="NousResearch/Hermes-3-Llama-3.2-3B",
+        self.answer_llm = transformers.pipeline("text-generation", model=answer_llm_name,
                                                 device=device, max_length=1000, truncation=True)
         # TODO: change answer_model to a locally saved model; also change the model to llama 3.1 7b-instruct
         # I have already downloaded llama 3.1 7b-instruct on my google drive.

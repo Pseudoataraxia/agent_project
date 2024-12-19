@@ -10,7 +10,9 @@ def main():
     device = 0 if torch.cuda.is_available() else -1
 
     guardrail = KeywordFilterGuardrail()
-    agent = WikipediaQAAgent(guardrail=guardrail, device=device)
+    agent = WikipediaQAAgent(embedding_model_name="sentence-transformers/all-MiniLM-L6-v2",
+                             answer_llm_name="/content/drive/My Drive/llama3_colab_installed/llama3_2_1b_instruct_transformer_4_46_3",
+                             guardrail=guardrail, device=device)
 
     question = "Who is Jeffrey Dahmer and what were his crimes?"
     final_answer = agent(question)

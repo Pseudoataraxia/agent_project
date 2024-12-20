@@ -1,38 +1,7 @@
-# README of our project for the agent course
+# Work in this Repo.
 
-## File structure
-- `agent_project` contains the code we wrote, including Wikipedia QA Agent, selfie guardrail, and keyword filter guardrail.
-- `selfie_src` contains the original code in SelfIE paper and our modified version. 
-  - `selfie` contains the original code, which we do not use. 
-  - `selfie_for_transformers_4_46_3` contains our modified version of SelfIE. 
-  - The original code only applies to `transformers==4.34.0` and is incompatible with the current `transformers==4.47.0`. Furthermore, it contained redundant, never-used functionalities. We rewrote almost all the code, transplanting its original logic to `transformers==4.46.3` and later versions and removing some of the redundancies.
-
-## Runnable Jupyter Notebooks
-
-Our demonstrations are in 2 `.ipynb` files.
-
-- `./agent_test.ipynb`. This file shows how our Wikipedia QA Agent and guardrails work. It also explores the reason why it fails to directly apply SelfIE to agents/llms as a guardrail.
-- `./selfie_src/demo_for_4_46_3.ipynb`. This file shows a runnable example of probing how the input to Wikipedia QA Agent is processed by its internal LLM. In the entire pipeline, the input question is first given to the probing SelfIE before being given to the QA agent.
-
-Other `.ipynb` files are from the original paper's repo. Most of them are not compatible with current versions of `transformers` library.
-
-Note that our implementation requires locally downloaded models. This can be modified in the places where the relevant functionalities are used.
-
-## Notes about why SelfIE fails
-
-Our initial goal was implementing a guardrail for a Wikipedia QA agent based on SelfIE. However, as demonstrated toward the end of our report, this appears to be impossible. Therefore we changed to probing the Wikipedia QA agent with SelfIE.
-
-We speculate that the reason might be
-- The internal representations in the middle or deeper layers of the LLM might not be suitable to be directly put into the initial layers. It looks like the LLM uses different ways to encode information into embeddings in the first layers and middle layers, and misplacing them would cause serious errors.
-- The representations in the same layer across different tokens might tend to be similar, causing the repetitive behavior of SelfIE as demonstrated in our .ipynb file.
-
-We leave further explorations to future research.
-
----
-
-# README of the original SelfIE paper
-
-## *most contents might be obsolete
+# MODIFICATION Dec/15/2024:
+# For the code specially tailored for the newest transformers version(`transformers==4.46.3`), run `demo_for_4_46_3.ipynb` and see the folder `selfie_for_transformers_4_46_3`.
 
 This repository contains the code and data for the paper [`SelfIE`: Self-Interpretation of Large Language Model Embeddings](https://arxiv.org/abs/2403.10949) by [Haozhe Chen](https://tonychen.xyz/), [Carl Vondrick](https://www.cs.columbia.edu/~vondrick/), and [Chengzhi Mao](http://www.cs.columbia.edu/~mcz/).
 

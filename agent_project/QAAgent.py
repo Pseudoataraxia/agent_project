@@ -3,12 +3,11 @@ import transformers
 import torch
 from langchain import WikipediaAPIWrapper
 from langchain.docstore.document import Document
-# from langchain.llms import HuggingFacePipeline
 from langchain.embeddings.base import Embeddings
 from langchain.text_splitter import CharacterTextSplitter
 from langchain.vectorstores import FAISS
 
-from .guardrail import NoGuardrail
+from .guardrail import NoGuardrail, SelfIEGuardrail, KeywordFilterGuardrail
 
 
 class HuggingFaceEmbeddings(Embeddings):
@@ -53,10 +52,10 @@ class HuggingFaceEmbeddings(Embeddings):
 
 
 class WikipediaQAAgent:
+    system_message = "You are a Wikipedia QA agent that answers user's questions based on relevant Wikipedia passages."
     safety_alert_message = "Guardrail alerted. Sorry, I can't help with that."
-    # TODO: might change this message to a better one?
 
-    def __init__(self, embedding_model_name, answer_llm_name, guardrail, device=None):
+    def __init__(self, embedding_model_name: str, answer_llm_name: str, guardrail_type: str, device=None):
         if device is None:
             device = 0 if torch.cuda.is_available() else -1
 
@@ -64,7 +63,13 @@ class WikipediaQAAgent:
         self.answer_llm = transformers.pipeline("text-generation", model=answer_llm_name,
                                                 device=device, max_length=1000, truncation=True)
         self.wikipedia_tool = WikipediaAPIWrapper()
-        self.guardrail = guardrail if guardrail is not None else NoGuardrail()
+
+        if guardrail_type == "SelfIE":
+            self.guardrail = SelfIEGuardrail(answer_llm=self.answer_llm)
+        elif guardrail_type == "Keyword Filter":
+            self.guardrail = KeywordFilterGuardrail()
+        else:
+            self.guardrail = NoGuardrail()
 
     def __call__(self, question: str | list[str]) -> str | list[str]:
         return self._qa_pipeline(question) if isinstance(question, str) else self._batch_qa_pipeline(question)
@@ -76,7 +81,7 @@ class WikipediaQAAgent:
         return [Document(page_content=passage) for passage in passages]
 
     def _create_vector_store(self, documents):
-        print(documents)
+        # print(documents)
         return FAISS.from_documents(documents, self.embedding_model)
 
     def _qa_pipeline(self, question: str) -> str:
@@ -85,17 +90,33 @@ class WikipediaQAAgent:
         retriever = vector_store.as_retriever()
         relevant_passages = retriever.get_relevant_documents(question)
         combined_passages = "\n".join([doc.page_content for doc in relevant_passages])
-        prompt = f"Question: {question}\nPassages:\n{combined_passages}\nAnswer:"
-        is_safe = self.guardrail(prompt)
+        prompt_for_guardrail = f"Question: {question}\nRelevant Passages:\n{combined_passages}\nAnswer:"
+        is_safe = self.guardrail(prompt_for_guardrail)
         if not is_safe:
             return WikipediaQAAgent.safety_alert_message
-        final_answer = self.answer_llm(prompt)
+
+        chat = [
+            {'role': 'system', 'content': WikipediaQAAgent.system_message},
+            {'role': 'question', 'content': question},
+            {'role': 'relevant passages', 'content': combined_passages},
+        ]
+        prompt_for_model = self.answer_llm.tokenizer.apply_chat_template(chat, tokenize=False,
+                                                                         add_generation_prompt=True, return_tensors="pt")
+        final_answer = self.answer_llm(prompt_for_model)
         return final_answer
 
     def _batch_qa_pipeline(self, questions: list[str]) -> list[str]:
+        """
+        write this in batch processing form.
+        Args:
+            questions:
+
+        Returns:
+
+        """
         answers = []
         for question in questions:
             ans = self._qa_pipeline(question)
             answers.append(ans)
-            print(ans)
+            # print(ans)
         return answers

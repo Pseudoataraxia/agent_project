@@ -118,8 +118,8 @@ def interpret(original_prompt=None,
                     model.device)
 
             output = my_generate_interpret(**batched_interpretation_prompt_model_inputs, model=model,
-                                        max_new_tokens=max_new_tokens, insert_info=batch_insert_infos,
-                                        pad_token_id=tokenizer.eos_token_id, output_attentions=False)
+                                           max_new_tokens=max_new_tokens, insert_info=batch_insert_infos,
+                                           pad_token_id=tokenizer.eos_token_id, output_attentions=False)
 
             generated_output = output[:, repeat_prompt_n_tokens:]
             cropped_interpretation = tokenizer.batch_decode(generated_output, skip_special_tokens=True)
@@ -135,13 +135,13 @@ def interpret(original_prompt=None,
 
 
 def my_interpret(original_prompt=None,
-              tokenizer=None,
-              interpretation_prompt=None,
-              model=None,
-              tokens_to_interpret=None,
-              bs=8,
-              max_new_tokens=30,
-              k=1) -> dict[str, list]:
+                 tokenizer=None,
+                 interpretation_prompt=None,
+                 model=None,
+                 tokens_to_interpret=None,
+                 bs=8,
+                 max_new_tokens=30,
+                 k=1) -> dict[str, list]:
     print(f"Interpreting '{original_prompt}' with '{interpretation_prompt.interpretation_prompt}'")
     tokenized_interpretation_prompt = interpretation_prompt.tokenized_interpretation_prompt
     tokenized_interpretation_prompt = tokenized_interpretation_prompt.to(model.device)
@@ -195,8 +195,8 @@ def my_interpret(original_prompt=None,
                     model.device)
 
             output = my_generate_interpret(**batched_interpretation_prompt_model_inputs, model=model,
-                                        max_new_tokens=max_new_tokens, insert_info=batch_insert_infos,
-                                        pad_token_id=tokenizer.eos_token_id, output_attentions=False)
+                                           max_new_tokens=max_new_tokens, insert_info=batch_insert_infos,
+                                           pad_token_id=tokenizer.eos_token_id, output_attentions=False)
 
             generated_output = output[:, repeat_prompt_n_tokens:]
             cropped_interpretation = tokenizer.batch_decode(generated_output, skip_special_tokens=True)
@@ -238,8 +238,8 @@ def interpret_vectors(vecs=None, model=None, interpretation_prompt=None, tokeniz
                 'cuda:0')
             repeat_prompt_n_tokens = tokenized_interpretation_prompt['input_ids'].shape[-1]
             output = my_generate_interpret(**batched_interpretation_prompt_model_inputs, model=model,
-                                        max_new_tokens=max_new_tokens, insert_info=batch_insert_infos,
-                                        pad_token_id=tokenizer.eos_token_id, output_attentions=False)
+                                           max_new_tokens=max_new_tokens, insert_info=batch_insert_infos,
+                                           pad_token_id=tokenizer.eos_token_id, output_attentions=False)
 
             cropped_interpretation_tokens = output[:, repeat_prompt_n_tokens:]
             cropped_interpretation = tokenizer.batch_decode(cropped_interpretation_tokens, skip_special_tokens=True)

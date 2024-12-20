@@ -4,10 +4,10 @@ from transformers.models.llama.modeling_llama import *
 class CustomLlamaModel(LlamaModel):
     def __init__(self, config):
         super().__init__(config)
-        self.insert_info = None
+        self.patching_config = None
 
-    def set_insert_info(self, insert_info):
-        self.insert_info = insert_info
+    def set_patching_config(self, patching_config):
+        self.patching_config = patching_config
 
     @add_start_docstrings_to_model_forward(LLAMA_INPUTS_DOCSTRING)
     def forward(
@@ -81,22 +81,22 @@ class CustomLlamaModel(LlamaModel):
         for layer_idx, decoder_layer in enumerate(self.layers[: self.config.num_hidden_layers]):
 
             # TODO:
-            if hidden_states.shape[1] > 1 and self.insert_info is not None:
-                for batch_item_idx in range(len(self.insert_info)):
-                    if layer_idx in self.insert_info[batch_item_idx].keys():
-                        if self.insert_info[batch_item_idx]['replacing_mode'] == 'addition':
-                            hidden_states[batch_item_idx:batch_item_idx + 1, self.insert_info[batch_item_idx][layer_idx][0], :] += \
-                                self.insert_info[batch_item_idx]['overlay_strength'] * self.insert_info[batch_item_idx][layer_idx][
+            if hidden_states.shape[1] > 1 and self.patching_config is not None:
+                for batch_item_idx in range(len(self.patching_config)):
+                    if layer_idx in self.patching_config[batch_item_idx].keys():
+                        if self.patching_config[batch_item_idx]['replacing_mode'] == 'addition':
+                            hidden_states[batch_item_idx:batch_item_idx + 1, self.patching_config[batch_item_idx][layer_idx][0], :] += \
+                                self.patching_config[batch_item_idx]['overlay_strength'] * self.patching_config[batch_item_idx][layer_idx][
                                     1].to(
                                     hidden_states.device)
-                        elif self.insert_info[batch_item_idx]['replacing_mode'] == 'normalized':
-                            hidden_states[batch_item_idx:batch_item_idx + 1, self.insert_info[batch_item_idx][layer_idx][0], :] = \
-                                self.insert_info[batch_item_idx]['overlay_strength'] * self.insert_info[batch_item_idx][layer_idx][
+                        elif self.patching_config[batch_item_idx]['replacing_mode'] == 'normalized':
+                            hidden_states[batch_item_idx:batch_item_idx + 1, self.patching_config[batch_item_idx][layer_idx][0], :] = \
+                                self.patching_config[batch_item_idx]['overlay_strength'] * self.patching_config[batch_item_idx][layer_idx][
                                     1].to(
                                     hidden_states.device) + (
-                                        1 - self.insert_info[batch_item_idx]['overlay_strength']) * hidden_states[
+                                        1 - self.patching_config[batch_item_idx]['overlay_strength']) * hidden_states[
                                                                                                batch_item_idx:batch_item_idx + 1,
-                                                                                               self.insert_info[
+                                                                                               self.patching_config[
                                                                                                    batch_item_idx][
                                                                                                    layer_idx][0], :]
 
